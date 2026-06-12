@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             PenerbitSeeder::class,
             SupplierSeeder::class,
             KitabSeeder::class,
+            PelangganSeeder::class,
         ]);
     }
 }
