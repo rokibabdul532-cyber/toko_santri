@@ -20,7 +20,6 @@ class StokController extends Controller
         ];
         $activeMenu = 'stok';
 
-        // Data untuk filter
         $kategori = KategoriModel::select('kategori_id', 'nama_kategori')->get();
 
         return view('stok.index', compact('breadcrumb', 'page', 'activeMenu', 'kategori'));
@@ -31,12 +30,10 @@ class StokController extends Controller
         $stok = KitabModel::select('kitab_id', 'kode_kitab', 'judul_kitab', 'kategori_id', 'stok', 'stok_minimal', 'harga_jual', 'status')
             ->with('kategori');
 
-        // Filter berdasarkan kategori
         if ($request->filter_kategori) {
             $stok->where('kategori_id', $request->filter_kategori);
         }
 
-        // Filter status stok
         if ($request->filter_status == 'menipis') {
             $stok->whereColumn('stok', '<=', 'stok_minimal');
         } elseif ($request->filter_status == 'habis') {
@@ -120,9 +117,15 @@ class StokController extends Controller
         return redirect('/');
     }
 
-    // Rekap stok per kategori
+    // ==================== REKAP STOK PER KATEGORI ====================
     public function rekap()
     {
+        $breadcrumb = (object) [
+            'title' => 'Rekap Stok per Kategori',
+            'list' => ['Home', 'Stok', 'Rekap']
+        ];
+        $activeMenu = 'stok';
+
         $rekap = KategoriModel::with(['kitab' => function ($query) {
             $query->select('kategori_id', 'stok', 'stok_minimal');
         }])->get();
@@ -135,14 +138,19 @@ class StokController extends Controller
                 return $kitab->stok <= $kitab->stok_minimal;
             })->count();
 
-            $data[] = [
+            $data[] = (object) [
                 'kategori' => $kategori->nama_kategori,
                 'total_stok' => $total_stok,
                 'total_stok_minimal' => $total_stok_minimal,
-                'kitab_menipis' => $kitab_menipis
+                'kitab_menipis' => $kitab_menipis,
+                'kitab_count' => $kategori->kitab->count()
             ];
         }
 
-        return response()->json($data);
+        return view('stok.rekap', [
+            'breadcrumb' => $breadcrumb,
+            'activeMenu' => $activeMenu,
+            'data' => $data
+        ]);
     }
 }
