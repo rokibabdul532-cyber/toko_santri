@@ -133,6 +133,12 @@ class PembelianController extends Controller
         return view('pembelian.show_ajax', ['pembelian' => $pembelian]);
     }
 
+    public function confirm_ajax($id)
+    {
+        $pembelian = PembelianModel::with(['supplier'])->find($id);
+        return view('pembelian.confirm_ajax', ['pembelian' => $pembelian]);
+    }
+
     public function delete_ajax(Request $request, $id)
     {
         if ($request->ajax() || $request->wantsJson()) {

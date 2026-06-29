@@ -87,6 +87,7 @@ Route::prefix('kategori')->group(function () {
     Route::put('/{id}/update_ajax', [KategoriController::class, 'update_ajax']);
     Route::get('/{id}/delete_ajax', [KategoriController::class, 'confirm_ajax']);
     Route::delete('/{id}/delete_ajax', [KategoriController::class, 'delete_ajax']);
+    Route::get('/{id}/show_ajax', [KategoriController::class, 'show_ajax']);
 });
 
 // Route untuk Pengarang
@@ -95,6 +96,7 @@ Route::prefix('pengarang')->group(function () {
     Route::post('/list', [PengarangController::class, 'list']);
     Route::get('/create_ajax', [PengarangController::class, 'create_ajax']);
     Route::post('/ajax', [PengarangController::class, 'store_ajax']);
+    Route::get('/{id}/show_ajax', [PengarangController::class, 'show_ajax']);
     Route::get('/{id}/edit_ajax', [PengarangController::class, 'edit_ajax']);
     Route::put('/{id}/update_ajax', [PengarangController::class, 'update_ajax']);
     Route::get('/{id}/delete_ajax', [PengarangController::class, 'confirm_ajax']);

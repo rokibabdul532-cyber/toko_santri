@@ -13,10 +13,10 @@
         </div>
     </div>
 @else
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Detail Stok Kitab</h5>
+                <h5 class="modal-title">Detail Data Kitab</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -28,18 +28,19 @@
                     <tr><th>Kategori</th><td>{{ $kitab->kategori->nama_kategori ?? '-' }}</td></tr>
                     <tr><th>Pengarang</th><td>{{ $kitab->pengarang->nama_pengarang ?? '-' }}</td></tr>
                     <tr><th>Penerbit</th><td>{{ $kitab->penerbit->nama_penerbit ?? '-' }}</td></tr>
-                    <tr>
-                        <th>Stok Saat Ini</th>
-                        <td>
-                            {{ $kitab->stok }}
-                            @if($kitab->stok <= $kitab->stok_minimal)
-                                <span class="text-danger">(Menipis)</span>
-                            @endif
-                        </td>
-                    </tr>
+                    <tr><th>Supplier</th><td>{{ $kitab->supplier->nama_supplier ?? '-' }}</td></tr>
+                    <tr><th>Tahun Terbit</th><td>{{ $kitab->tahun_terbit ?? '-' }}</td></tr>
+                    <tr><th>Tebal Buku</th><td>{{ $kitab->tebal_buku ?? '-' }} halaman</td></tr>
+                    <tr><th>Bahasa</th><td>{{ $kitab->bahasa ?? '-' }}</td></tr>
+                    <tr><th>Stok</th><td>{{ $kitab->stok }}</td></tr>
                     <tr><th>Stok Minimal</th><td>{{ $kitab->stok_minimal }}</td></tr>
                     <tr><th>Harga Beli</th><td>Rp {{ number_format($kitab->harga_beli, 0, ',', '.') }}</td></tr>
                     <tr><th>Harga Jual</th><td>Rp {{ number_format($kitab->harga_jual, 0, ',', '.') }}</td></tr>
+                    <tr><th>Diskon</th><td>{{ $kitab->diskon }}%</td></tr>
+                    <tr><th>Status</th><td>{{ ucfirst($kitab->status) }}</td></tr>
+                    <tr><th>Deskripsi</th><td>{{ $kitab->deskripsi ?? '-' }}</td></tr>
+                    <tr><th>Created At</th><td>{{ $kitab->created_at }}</td></tr>
+                    <tr><th>Updated At</th><td>{{ $kitab->updated_at }}</td></tr>
                 </table>
             </div>
             <div class="modal-footer">

@@ -30,7 +30,8 @@ class PengarangController extends Controller
         return DataTables::of($pengarang)
             ->addIndexColumn()
             ->addColumn('aksi', function ($pengarang) {
-                $btn = '<button onclick="modalAction(\'' . url('/pengarang/' . $pengarang->pengarang_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn = '<button onclick="modalAction(\'' . url('/pengarang/' . $pengarang->pengarang_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/pengarang/' . $pengarang->pengarang_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
                 $btn .= '<button onclick="modalAction(\'' . url('/pengarang/' . $pengarang->pengarang_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
@@ -73,9 +74,23 @@ class PengarangController extends Controller
         return redirect('/');
     }
 
+    public function show_ajax($id)
+    {
+        $pengarang = PengarangModel::find($id);
+        return view('pengarang.show_ajax', ['pengarang' => $pengarang]);
+    }
+
     public function edit_ajax($id)
     {
         $pengarang = PengarangModel::find($id);
+    
+        if (!$pengarang) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data pengarang tidak ditemukan'
+            ]);
+        }
+        
         return view('pengarang.edit_ajax', ['pengarang' => $pengarang]);
     }
 

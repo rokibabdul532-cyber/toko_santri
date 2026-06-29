@@ -159,6 +159,12 @@ class PenjualanController extends Controller
         return view('penjualan.show_ajax', ['penjualan' => $penjualan]);
     }
 
+    public function confirm_ajax($id)
+    {
+        $penjualan = PenjualanModel::with('user')->find($id);
+        return view('penjualan.confirm_ajax', ['penjualan' => $penjualan]);
+    }
+
     public function delete_ajax(Request $request, $id)
     {
         if ($request->ajax() || $request->wantsJson()) {
