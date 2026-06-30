@@ -4,6 +4,19 @@
     </a>
     
     <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="info">
+                <a href="#" class="d-block">
+                    <i class="fas fa-user-circle fa-2x"></i>
+                    <span class="ml-2">{{ Auth::user()->nama ?? 'Guest' }}</span>
+                </a>
+                <small class="text-muted ml-2">
+                    {{ Auth::user()->level->level_nama ?? 'Pengguna' }}
+                </small>
+            </div>
+        </div>
+
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 
@@ -165,6 +178,17 @@
                             </a>
                         </li>
                     </ul>
+                </li>
+                
+                <!-- ==================== LOGOUT ==================== -->
+                <li class="nav-item mt-3">
+                    <form action="{{ url('/logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="nav-link btn btn-danger btn-block" style="border-radius: 0; text-align: left; color: white;">
+                            <i class="nav-icon fas fa-sign-out-alt"></i>
+                            <p>Logout</p>
+                        </button>
+                    </form>
                 </li>
                 
             </ul>

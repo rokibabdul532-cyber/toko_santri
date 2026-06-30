@@ -15,6 +15,12 @@ use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\pelangganController;
 use App\Http\Controllers\SantriController;
 use App\Http\Controllers\PaketKitabController;
+use App\Http\Controllers\AuthController;
+
+// ==================== ROUTE LOGIN & LOGOUT ====================
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 
 // Halaman Dashboard
 Route::get('/', [DashboardController::class, 'index']);
