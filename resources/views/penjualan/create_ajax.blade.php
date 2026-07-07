@@ -90,7 +90,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-8">
-                                        <label>Diskon</label>
+                                        <label>Diskon (%)</label>
                                     </div>
                                     <div class="col-4 text-right">
                                         <input type="number" name="diskon" id="diskon" class="form-control form-control-sm text-right" value="0" min="0" max="100" step="1">
@@ -138,52 +138,23 @@
 </form>
 
 <script>
-let keranjang = [];
+// Gunakan IIFE untuk menghindari duplikasi variabel
+(function() {
+    // Cek apakah keranjang sudah ada di scope global
+    if (typeof window.keranjangPOS === 'undefined') {
+        window.keranjangPOS = [];
+    }
+    var keranjang = window.keranjangPOS;
 
-$(document).ready(function() {
-    // Tambah item ke keranjang
-    $('.tambah-item').click(function() {
-        let id = $(this).data('id');
-        let kode = $(this).data('kode');
-        let judul = $(this).data('judul');
-        let harga = $(this).data('harga');
-        let stok = $(this).data('stok');
-
-        // Cek apakah item sudah ada di keranjang
-        let existing = keranjang.find(item => item.id === id);
-        if (existing) {
-            if (existing.jumlah + 1 > stok) {
-                Swal.fire({ icon: 'warning', title: 'Stok Habis', text: `Stok ${judul} hanya tersisa ${stok}` });
-                return;
-            }
-            existing.jumlah++;
-            existing.subtotal = existing.jumlah * existing.harga;
-        } else {
-            if (1 > stok) {
-                Swal.fire({ icon: 'warning', title: 'Stok Habis', text: `Stok ${judul} habis` });
-                return;
-            }
-            keranjang.push({
-                id: id,
-                kode: kode,
-                judul: judul,
-                harga: harga,
-                jumlah: 1,
-                subtotal: harga
-            });
-        }
-        renderKeranjang();
-    });
-
-    // Render keranjang
+    // Fungsi render keranjang
     function renderKeranjang() {
-        let html = '';
-        let subtotal = 0;
+        var html = '';
+        var subtotal = 0;
 
         if (keranjang.length === 0) {
             html = '<tr id="empty-keranjang"><td colspan="5" class="text-center text-muted">Belum ada item</td></tr>';
         } else {
-            keranjang.forEach((item, index) => {
+            keranjang.forEach(function(item, index) {
                 subtotal += item.subtotal;
                 html += `
                     <tr>
@@ -206,106 +177,158 @@ $(document).ready(function() {
             });
         }
 
-        $('#keranjang-body').html(html);
-        $('#subtotal').text('Rp ' + subtotal.toLocaleString('id-ID'));
+        document.getElementById('keranjang-body').innerHTML = html;
+        document.getElementById('subtotal').textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
         
-        // Hitung total setelah diskon
         hitungTotal();
         
         // Bind event untuk qty
-        $('.qty-item').on('change', function() {
-            let index = $(this).data('index');
-            let newQty = parseInt($(this).val());
-            if (newQty > 0) {
-                keranjang[index].jumlah = newQty;
-                keranjang[index].subtotal = keranjang[index].jumlah * keranjang[index].harga;
-                renderKeranjang();
-            }
+        document.querySelectorAll('.qty-item').forEach(function(el) {
+            el.addEventListener('change', function() {
+                var index = parseInt(this.dataset.index);
+                var newQty = parseInt(this.value);
+                if (newQty > 0) {
+                    keranjang[index].jumlah = newQty;
+                    keranjang[index].subtotal = keranjang[index].jumlah * keranjang[index].harga;
+                    renderKeranjang();
+                }
+            });
         });
 
         // Bind event untuk remove
-        $('.remove-item').click(function() {
-            let index = $(this).data('index');
-            keranjang.splice(index, 1);
-            renderKeranjang();
+        document.querySelectorAll('.remove-item').forEach(function(el) {
+            el.addEventListener('click', function() {
+                var index = parseInt(this.dataset.index);
+                keranjang.splice(index, 1);
+                renderKeranjang();
+            });
         });
     }
 
     // Hitung total setelah diskon
     function hitungTotal() {
-        let subtotal = 0;
-        keranjang.forEach(item => {
+        var subtotal = 0;
+        keranjang.forEach(function(item) {
             subtotal += item.subtotal;
         });
-        let diskon = parseFloat($('#diskon').val()) || 0;
-        let total = subtotal - (subtotal * diskon / 100);
-        $('#total').text('Rp ' + total.toLocaleString('id-ID'));
-        $('#total_hidden').val(total);
+        var diskon = parseFloat(document.getElementById('diskon').value) || 0;
+        var total = subtotal - (subtotal * diskon / 100);
+        document.getElementById('total').textContent = 'Rp ' + total.toLocaleString('id-ID');
+        document.getElementById('total_hidden').value = total;
         hitungKembalian();
     }
 
     // Hitung kembalian
     function hitungKembalian() {
-        let total = parseFloat($('#total_hidden').val()) || 0;
-        let bayar = parseFloat($('#bayar').val()) || 0;
-        let kembalian = bayar - total;
+        var total = parseFloat(document.getElementById('total_hidden').value) || 0;
+        var bayar = parseFloat(document.getElementById('bayar').value) || 0;
+        var kembalian = bayar - total;
         if (kembalian < 0) kembalian = 0;
-        $('#kembalian').text('Rp ' + kembalian.toLocaleString('id-ID'));
+        document.getElementById('kembalian').textContent = 'Rp ' + kembalian.toLocaleString('id-ID');
     }
 
-    // Event listener
-    $('#diskon').on('keyup change', function() {
-        hitungTotal();
+    // Tambah item ke keranjang
+    document.querySelectorAll('.tambah-item').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = parseInt(this.dataset.id);
+            var kode = this.dataset.kode;
+            var judul = this.dataset.judul;
+            var harga = parseFloat(this.dataset.harga);
+            var stok = parseInt(this.dataset.stok);
+
+            var existing = keranjang.find(function(item) { return item.id === id; });
+            if (existing) {
+                if (existing.jumlah + 1 > stok) {
+                    Swal.fire({ icon: 'warning', title: 'Stok Habis', text: 'Stok ' + judul + ' hanya tersisa ' + stok });
+                    return;
+                }
+                existing.jumlah++;
+                existing.subtotal = existing.jumlah * existing.harga;
+            } else {
+                if (1 > stok) {
+                    Swal.fire({ icon: 'warning', title: 'Stok Habis', text: 'Stok ' + judul + ' habis' });
+                    return;
+                }
+                keranjang.push({
+                    id: id,
+                    kode: kode,
+                    judul: judul,
+                    harga: harga,
+                    jumlah: 1,
+                    subtotal: harga
+                });
+            }
+            renderKeranjang();
+        });
     });
 
-    $('#bayar').on('keyup change', function() {
-        hitungKembalian();
-    });
+    // Event listener
+    document.getElementById('diskon').addEventListener('keyup', hitungTotal);
+    document.getElementById('diskon').addEventListener('change', hitungTotal);
+    document.getElementById('bayar').addEventListener('keyup', hitungKembalian);
+    document.getElementById('bayar').addEventListener('change', hitungKembalian);
 
     // Validasi form
-    $("#form-pos").validate({
-        rules: {
-            bayar: { required: true, number: true, min: 1 }
-        },
-        submitHandler: function(form) {
-            if (keranjang.length === 0) {
-                Swal.fire({ icon: 'warning', title: 'Keranjang Kosong', text: 'Silakan tambahkan kitab terlebih dahulu!' });
-                return false;
-            }
-            let total = parseFloat($('#total_hidden').val()) || 0;
-            let bayar = parseFloat($('#bayar').val()) || 0;
-            if (bayar < total) {
-                Swal.fire({ icon: 'error', title: 'Pembayaran Kurang', text: `Total: Rp ${total.toLocaleString('id-ID')}` });
-                return false;
-            }
-            
-            $.ajax({
-                url: form.action,
-                type: form.method,
-                data: $(form).serialize(),
-                success: function(response) {
-                    if (response.status) {
-                        $('#myModal').modal('hide');
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Transaksi Berhasil!',
-                            html: `<strong>Kode Transaksi:</strong> ${response.kode_penjualan}<br>
-                                   <strong>Total:</strong> Rp ${response.total.toLocaleString('id-ID')}<br>
-                                   <strong>Kembalian:</strong> Rp ${response.kembalian.toLocaleString('id-ID')}`
-                        });
-                        $('#table-penjualan').DataTable().ajax.reload();
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'Gagal', text: response.message });
-                    }
-                },
-                error: function() {
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan, silakan coba lagi' });
-                }
-            });
-            return false;
+    document.getElementById('form-pos').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (keranjang.length === 0) {
+            Swal.fire({ icon: 'warning', title: 'Keranjang Kosong', text: 'Silakan tambahkan kitab terlebih dahulu!' });
+            return;
         }
+        
+        var total = parseFloat(document.getElementById('total_hidden').value) || 0;
+        var bayar = parseFloat(document.getElementById('bayar').value) || 0;
+        
+        if (total == 0) {
+            document.getElementById('bayar').value = 0;
+            bayar = 0;
+        }
+        
+        if (bayar < total) {
+            Swal.fire({ icon: 'error', title: 'Pembayaran Kurang', text: 'Total: Rp ' + total.toLocaleString('id-ID') });
+            return;
+        }
+        
+        var form = this;
+        var formData = new FormData(form);
+        
+        $.ajax({
+            url: form.action,
+            type: form.method,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.status) {
+                    $('#myModal').modal('hide');
+                    // Reset keranjang
+                    keranjang = [];
+                    window.keranjangPOS = [];
+                    renderKeranjang();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Transaksi Berhasil!',
+                        html: '<strong>Kode Transaksi:</strong> ' + response.kode_penjualan + '<br>' +
+                               '<strong>Total:</strong> Rp ' + response.total.toLocaleString('id-ID') + '<br>' +
+                               '<strong>Kembalian:</strong> Rp ' + response.kembalian.toLocaleString('id-ID')
+                    });
+                    if ($.fn.DataTable.isDataTable('#table-penjualan')) {
+                        $('#table-penjualan').DataTable().ajax.reload();
+                    }
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: response.message });
+                }
+            },
+            error: function() {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan, silakan coba lagi' });
+            }
+        });
     });
-});
+
+    // Inisialisasi render
+    renderKeranjang();
+})();
 </script>
 
 <style>

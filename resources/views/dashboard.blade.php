@@ -81,7 +81,7 @@
                         <tbody>
                             @forelse($kitabTerlaris as $item)
                             <tr>
-                                <td>{{ $item->detail->first()->kitab->judul_kitab ?? '-' }}</td>
+                                <td>{{ $item->kitab->judul_kitab ?? 'Data tidak tersedia' }}</td>
                                 <td class="text-center">{{ $item->total_jual ?? 0 }}</td>
                             </tr>
                             @empty
@@ -104,7 +104,6 @@
             </div>
             <div class="card-body">
                 <table class="table table-bordered">
-                    <tr><th>Penjualan Hari Ini</th><td class="text-right">Rp {{ number_format($penjualanHariIni, 0, ',', '.') }}</td></tr>
                     <tr><th>Total Transaksi</th><td class="text-right">{{ $totalPenjualan }} transaksi</td></tr>
                 </table>
             </div>

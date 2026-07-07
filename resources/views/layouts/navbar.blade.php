@@ -10,16 +10,25 @@
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="fas fa-user"></i> TokoSantri
+                <i class="fas fa-user-circle"></i> 
+                {{ Auth::user()->nama ?? 'Guest' }}
+                <span class="badge badge-info ml-1">
+                    {{ Auth::user()->level->level_nama ?? 'Pengguna' }}
+                </span>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-user"></i> Profile
-                </a>
+                <span class="dropdown-item text-muted">
+                    <i class="fas fa-id-badge"></i> 
+                    Role: {{ Auth::user()->level->level_nama ?? '-' }}
+                </span>
+                <span class="dropdown-item text-muted">
+                    <i class="fas fa-user"></i> 
+                    {{ Auth::user()->nama ?? '-' }}
+                </span>
                 <div class="dropdown-divider"></div>
-                <form action="{{ url('/logout') }}" method="POST" id="logout-form">
+                <form action="{{ url('/logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="dropdown-item">
+                    <button type="submit" class="dropdown-item text-danger">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </button>
                 </form>

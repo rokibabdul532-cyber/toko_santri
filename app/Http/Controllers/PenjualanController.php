@@ -10,6 +10,7 @@ use App\Models\KaryawanModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class PenjualanController extends Controller
 {
@@ -98,27 +99,37 @@ class PenjualanController extends Controller
                 ];
             }
 
-            // Diskon (misal 0% dulu)
-            $diskon = 0;
+            // ========== PERBAIKAN: Ambil nilai diskon dari request ==========
+            $diskon = $request->diskon ?? 0;
             $total = $subtotal - ($subtotal * $diskon / 100);
-            $bayar = $request->bayar;
-            $kembalian = $bayar - $total;
-
-            if ($kembalian < 0) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Pembayaran kurang! Total: Rp ' . number_format($total, 0, ',', '.')
-                ]);
+            
+            // ========== PERBAIKAN: Jika total = 0, bayar = 0 ==========
+            if ($total == 0) {
+                $bayar = 0;
+                $kembalian = 0;
+            } else {
+                $bayar = $request->bayar;
+                $kembalian = $bayar - $total;
+                
+                if ($kembalian < 0) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Pembayaran kurang! Total: Rp ' . number_format($total, 0, ',', '.')
+                    ]);
+                }
             }
 
             // Generate kode penjualan
             $lastId = PenjualanModel::max('penjualan_id') + 1;
             $kode_penjualan = 'TRX' . str_pad($lastId, 5, '0', STR_PAD_LEFT);
 
+            // ========== PERBAIKAN: Ambil user_id dari Auth ==========
+            $userId = Auth::user()->user_id ?? 1;
+
             // Simpan penjualan
             $penjualan = PenjualanModel::create([
                 'kode_penjualan' => $kode_penjualan,
-                'user_id' => 1, // sementara, nanti pakai Auth
+                'user_id' => $userId,
                 'tanggal_penjualan' => date('Y-m-d'),
                 'subtotal' => $subtotal,
                 'diskon' => $diskon,

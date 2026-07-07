@@ -6,6 +6,7 @@ use App\Models\KitabModel;
 use App\Models\KaryawanModel;
 use App\Models\PenjualanModel;
 use App\Models\PembelianModel;
+use App\Models\PenjualanDetailModel;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -30,11 +31,10 @@ class DashboardController extends Controller
         // Total penjualan hari ini
         $penjualanHariIni = PenjualanModel::whereDate('tanggal_penjualan', date('Y-m-d'))->sum('total');
 
-        // 5 Kitab Terlaris
-        $kitabTerlaris = PenjualanModel::selectRaw('kitab_id, sum(jumlah) as total_jual')
-            ->join('penjualan_detail', 'penjualan.penjualan_id', '=', 'penjualan_detail.penjualan_id')
+        // 5 Kitab Terlaris - PERBAIKI INI
+        $kitabTerlaris = PenjualanDetailModel::selectRaw('kitab_id, SUM(jumlah) as total_jual')
+            ->with('kitab') // Relasi ke KitabModel
             ->groupBy('kitab_id')
-            ->with('detail.kitab')
             ->orderBy('total_jual', 'desc')
             ->limit(5)
             ->get();

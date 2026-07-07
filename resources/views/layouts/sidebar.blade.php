@@ -4,7 +4,7 @@
     </a>
     
     <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
+        <!-- Sidebar user panel -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="info">
                 <a href="#" class="d-block">
@@ -20,7 +20,7 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 
-                <!-- ==================== DASHBOARD ==================== -->
+                <!-- DASHBOARD -->
                 <li class="nav-item">
                     <a href="{{ url('/') }}" class="nav-link {{ ($activeMenu == 'dashboard') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -28,7 +28,8 @@
                     </a>
                 </li>
                 
-                <!-- ==================== DATA MASTER (Dropdown) ==================== -->
+                <!-- DATA MASTER - HANYA ADMIN -->
+                @if(Auth::check() && Auth::user()->level->level_kode == 'ADM')
                 <li class="nav-item has-treeview {{ (in_array($activeMenu, ['karyawan', 'kitab', 'kategori', 'pengarang', 'penerbit', 'supplier'])) ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-database"></i>
@@ -38,47 +39,36 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-                        <!-- Data Karyawan -->
                         <li class="nav-item">
                             <a href="{{ url('/karyawan') }}" class="nav-link {{ ($activeMenu == 'karyawan') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>Data Karyawan</p>
                             </a>
                         </li>
-                        
-                        <!-- Data Kitab -->
                         <li class="nav-item">
                             <a href="{{ url('/kitab') }}" class="nav-link {{ ($activeMenu == 'kitab') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-book"></i>
                                 <p>Data Kitab</p>
                             </a>
                         </li>
-                        
-                        <!-- Data Kategori Kitab -->
                         <li class="nav-item">
                             <a href="{{ url('/kategori') }}" class="nav-link {{ ($activeMenu == 'kategori') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-tag"></i>
                                 <p>Kategori Kitab</p>
                             </a>
                         </li>
-                        
-                        <!-- Data Pengarang -->
                         <li class="nav-item">
                             <a href="{{ url('/pengarang') }}" class="nav-link {{ ($activeMenu == 'pengarang') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-user-edit"></i>
                                 <p>Data Pengarang</p>
                             </a>
                         </li>
-                        
-                        <!-- Data Penerbit -->
                         <li class="nav-item">
                             <a href="{{ url('/penerbit') }}" class="nav-link {{ ($activeMenu == 'penerbit') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>Data Penerbit</p>
                             </a>
                         </li>
-                        
-                        <!-- Data Supplier -->
                         <li class="nav-item">
                             <a href="{{ url('/supplier') }}" class="nav-link {{ ($activeMenu == 'supplier') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-truck"></i>
@@ -87,8 +77,30 @@
                         </li>
                     </ul>
                 </li>
+                @endif
                 
-                <!-- ==================== TRANSAKSI (Dropdown) ==================== -->
+                <!-- DATA MASTER (MANAGER) - HANYA KITAB -->
+                @if(Auth::check() && Auth::user()->level->level_kode == 'MNG')
+                <li class="nav-item has-treeview {{ (in_array($activeMenu, ['kitab'])) ? 'menu-open' : '' }}">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-database"></i>
+                        <p>
+                            Data Master
+                            <i class="fas fa-angle-left right"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ url('/kitab') }}" class="nav-link {{ ($activeMenu == 'kitab') ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-book"></i>
+                                <p>Data Kitab</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
+                
+                <!-- TRANSAKSI - SEMUA ROLE -->
                 <li class="nav-item has-treeview {{ (in_array($activeMenu, ['pembelian', 'penjualan'])) ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-exchange-alt"></i>
@@ -98,15 +110,14 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
-                        <!-- Pembelian (dari supplier) -->
+                        @if(Auth::check() && in_array(Auth::user()->level->level_kode, ['ADM', 'MNG']))
                         <li class="nav-item">
                             <a href="{{ url('/pembelian') }}" class="nav-link {{ ($activeMenu == 'pembelian') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-shopping-cart"></i>
                                 <p>Pembelian</p>
                             </a>
                         </li>
-                        
-                        <!-- Penjualan (POS) -->
+                        @endif
                         <li class="nav-item">
                             <a href="{{ url('/penjualan') }}" class="nav-link {{ ($activeMenu == 'penjualan') ? 'active' : '' }}">
                                 <i class="nav-icon fas fa-cash-register"></i>
@@ -116,7 +127,7 @@
                     </ul>
                 </li>
                 
-                <!-- ==================== MANAJEMEN STOK ==================== -->
+                <!-- MANAJEMEN STOK - SEMUA ROLE -->
                 <li class="nav-item">
                     <a href="{{ url('/stok') }}" class="nav-link {{ ($activeMenu == 'stok') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-cubes"></i>
@@ -124,7 +135,8 @@
                     </a>
                 </li>
                 
-                <!-- ==================== DATA PELANGGAN & SANTRI (Dropdown) ==================== -->
+                <!-- PELANGGAN & SANTRI - HANYA ADMIN & MANAGER -->
+                @if(Auth::check() && in_array(Auth::user()->level->level_kode, ['ADM', 'MNG']))
                 <li class="nav-item has-treeview {{ (in_array($activeMenu, ['pelanggan', 'santri', 'paket_kitab'])) ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-users"></i>
@@ -154,8 +166,10 @@
                         </li>
                     </ul>
                 </li>
+                @endif
                 
-                <!-- ==================== LAPORAN (Dropdown) ==================== -->
+                <!-- LAPORAN - HANYA ADMIN & MANAGER -->
+                @if(Auth::check() && in_array(Auth::user()->level->level_kode, ['ADM', 'MNG']))
                 <li class="nav-item has-treeview {{ (in_array($activeMenu, ['laporan_penjualan', 'laporan_persediaan'])) ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link">
                         <i class="nav-icon fas fa-chart-line"></i>
@@ -179,8 +193,9 @@
                         </li>
                     </ul>
                 </li>
+                @endif
                 
-                <!-- ==================== LOGOUT ==================== -->
+                <!-- LOGOUT -->
                 <li class="nav-item mt-3">
                     <form action="{{ url('/logout') }}" method="POST">
                         @csrf
